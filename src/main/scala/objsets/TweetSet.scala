@@ -90,12 +90,12 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet:
     lazy val leftMost = left.mostRetweeted
     lazy val rightMost = right.mostRetweeted
 
-    if (!left.empty && leftMost.retweets > elem.retweets)
-      if (!right.empty && rightMost.retweets > leftMost.retweets)
+    if !left.empty && leftMost.retweets > elem.retweets then
+      if !right.empty && rightMost.retweets > leftMost.retweets then
         rightMost
       else
         leftMost
-    else if (!right.empty && rightMost.retweets > elem.retweets)
+    else if !right.empty && rightMost.retweets > elem.retweets then
       rightMost
     else
       elem
