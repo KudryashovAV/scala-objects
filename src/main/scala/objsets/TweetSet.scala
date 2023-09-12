@@ -8,7 +8,7 @@ import TweetReader.*
 class Tweet(val user: String, val text: String, val retweets: Int):
   override def toString: String =
     "User: " + user + "\n" +
-    "Text: " + text + " [" + retweets + "]"
+      "Text: " + text + " [" + retweets + "]"
 
 /**
  * This represents a set of objects of type `Tweet` in the form of a binary search
@@ -40,8 +40,6 @@ abstract class TweetSet extends TweetSetInterface:
 
   def mostRetweeted: Tweet
 
-  def empty: Boolean
-
   def descendingByRetweet: TweetList
 
   def incl(tweet: Tweet): TweetSet
@@ -59,11 +57,9 @@ class Empty extends TweetSet:
 
   def mostRetweeted: Tweet = throw new NoSuchElementException
 
-  def empty: Boolean = true
-
   def descendingByRetweet: TweetList = Nil
 
-//  The following methods are already implemented
+  //  The following methods are already implemented
 
   def contains(tweet: Tweet): Boolean = false
 
@@ -74,38 +70,22 @@ class Empty extends TweetSet:
   def foreach(f: Tweet => Unit): Unit = ()
 
 class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet:
-  def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = {
-    val memo = if (p(elem)) acc.incl(elem) else acc
-
+  def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet =
+    val memo = if p(elem) then acc.incl(elem) else acc
     left.filterAcc(p, right.filterAcc(p, memo))
-  }
 
-  def union(twits: TweetSet): TweetSet = {
+  def union(twits: TweetSet): TweetSet =
     (left union (right union twits)).incl(elem)
-  }
 
-  def empty: Boolean = false
+  def mostRetweeted: Tweet =
+    var mostRetweeted = elem
+    foreach(x => mostRetweeted = if x.retweets > elem.retweets then x else mostRetweeted)
+    mostRetweeted
 
-  def mostRetweeted: Tweet = {
-    lazy val leftMost = left.mostRetweeted
-    lazy val rightMost = right.mostRetweeted
-
-    if !left.empty && leftMost.retweets > elem.retweets then
-      if !right.empty && rightMost.retweets > leftMost.retweets then
-        rightMost
-      else
-        leftMost
-    else if !right.empty && rightMost.retweets > elem.retweets then
-      rightMost
-    else
-      elem
-  }
-
-  def descendingByRetweet: TweetList = {
+  def descendingByRetweet: TweetList =
     new Cons(mostRetweeted, remove(mostRetweeted).descendingByRetweet)
-  }
 
-//   The following methods are already implemented
+  //   The following methods are already implemented
 
   def contains(x: Tweet): Boolean =
     if x.text < elem.text then
@@ -137,8 +117,11 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet:
 
 trait TweetList:
   def head: Tweet
+
   def tail: TweetList
+
   def isEmpty: Boolean
+
   def foreach(f: Tweet => Unit): Unit =
     if !isEmpty then
       f(head)
@@ -146,7 +129,9 @@ trait TweetList:
 
 object Nil extends TweetList:
   def head = throw java.util.NoSuchElementException("head of EmptyList")
+
   def tail = throw java.util.NoSuchElementException("tail of EmptyList")
+
   def isEmpty = true
 
 class Cons(val head: Tweet, val tail: TweetList) extends TweetList:
