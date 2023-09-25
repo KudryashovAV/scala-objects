@@ -79,7 +79,7 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet:
 
   def mostRetweeted: Tweet =
     var mostRetweeted = elem
-    foreach(x => mostRetweeted = if x.retweets > elem.retweets then x else mostRetweeted)
+    foreach(x => mostRetweeted = if x.retweets > mostRetweeted.retweets then x else mostRetweeted)
     mostRetweeted
 
   def descendingByRetweet: TweetList =
